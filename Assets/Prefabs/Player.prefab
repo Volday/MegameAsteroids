@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8893978200547225616}
   - component: {fileID: 4837543734374814266}
   - component: {fileID: 1726274776550327204}
+  - component: {fileID: -1076325913922025801}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -59,12 +60,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa64b0b105c1db3439d73ef7abaf7a16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 10
+  maxSpeed: 8
   rotationSpeed: 90
   acceleration: 0.02
   attackSpeed: 0.1
   bulletLifeTime: 5
-  bulletMoveSpeed: 20
+  bulletMoveSpeed: 10
 --- !u!114 &1726274776550327204
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -80,6 +81,18 @@ MonoBehaviour:
   defaultController: 0
   controllers:
   - {fileID: 11400000, guid: 1bfc40e44081f264289e7b875d9a8e62, type: 2}
+--- !u!114 &-1076325913922025801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2301123665911337255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac25160e3b187714f95a0412223c8540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5476765274571773523
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1165502426785831879}
   - component: {fileID: 5119594420033900282}
+  - component: {fileID: 8046470814678905582}
   m_Layer: 0
   m_Name: GreenBullet
   m_TagString: Untagged
@@ -42,6 +43,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 28abaff34c53f3c49b5bd340d9ef8a8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8046470814678905582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1500317550871685558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac25160e3b187714f95a0412223c8540, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &4131313505952620108
