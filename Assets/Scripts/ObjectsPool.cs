@@ -15,38 +15,22 @@ public class ObjectsPool : MonoBehaviour
 
     public Dictionary<PoolType, int> listsOfPooledPrefabs = new Dictionary<PoolType, int>();
 
-    public List<Pool> pools = new List<Pool>();
+    public Pool[] pools;
 
-    public void Initialization(int _startAsteroidsCount, int _increaseAsteroidsCount, int _numberOfAsteroidChild, 
-        int _maxPlayerBulletCount, int _maxUFOBulletCount)
+    private void Awake()
     {
-        for (int i = 0; i < pools.Count; i++) {
+        for (int i = 0; i < pools.Length; i++)
+        {
             listsOfPooledPrefabs.Add(pools[i].poolType, i);
-        }
-
-        pools[listsOfPooledPrefabs[PoolType.bigAsteroid]].SetExtensionOverWave(_increaseAsteroidsCount);
-        pools[listsOfPooledPrefabs[PoolType.mediumAsteroid]].SetExtensionOverWave(_increaseAsteroidsCount * _numberOfAsteroidChild);
-        pools[listsOfPooledPrefabs[PoolType.smallAsteroid]].SetExtensionOverWave(_increaseAsteroidsCount * _numberOfAsteroidChild * _numberOfAsteroidChild);
-
-        if (listsOfPooledPrefabs.ContainsKey(PoolType.bigAsteroid))
-        {
-            pools[listsOfPooledPrefabs[PoolType.bigAsteroid]].Extension(_startAsteroidsCount);
-        }
-
-        if (listsOfPooledPrefabs.ContainsKey(PoolType.greenBullet))
-        {
-            pools[listsOfPooledPrefabs[PoolType.greenBullet]].Extension(_maxPlayerBulletCount);
-        }
-
-        if (listsOfPooledPrefabs.ContainsKey(PoolType.redBullet))
-        {
-            pools[listsOfPooledPrefabs[PoolType.redBullet]].Extension(_maxUFOBulletCount);
         }
     }
 
-    public void NewWave()
+    public void PoolsExtension()
     {
-
+        for (int i = 0; i < pools.Length; i++)
+        {
+            pools[i].Extension();
+        }
     }
 
     public GameObject GetPooledObject(PoolType _poolType)
@@ -56,7 +40,7 @@ public class ObjectsPool : MonoBehaviour
 
     public void ResetPools()
     {
-        for (int i = 0; i < pools.Count; i++)
+        for (int i = 0; i < pools.Length; i++)
         {
             pools[i].ResetPool();
         }
@@ -68,8 +52,8 @@ public class ObjectsPool : MonoBehaviour
         public GameObject prefab;
         private List<GameObject> pooledPrefabs = new List<GameObject>();
         private Queue<GameObject> pooledPrefabsQueue = new Queue<GameObject>();
-        private int extensionOverWave;
-        private int countOfUsingObjects;
+        private int extensionOverWave = 0;
+        private int countOfUsingObjects = 0;
 
         public void Extension(int _extensionCount) {
             for (int i = 0; i < _extensionCount; i++) {

@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 
-public abstract class Controller: ScriptableObject
+public abstract class Controller : ScriptableObject
 {
-    public Player player;
+    [HideInInspector] public Player player;
+    [HideInInspector] public bool shootButtonDown = false;
     public abstract void ControlsUpdate();
 }

@@ -1,10 +1,13 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EdgeScreenTeleport : MonoBehaviour
 {
     private Camera mainCamera;
+
+    Queue<Action> actions = new Queue<Action>();
+
     private void Awake()
     {
         mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
@@ -32,6 +35,20 @@ public class EdgeScreenTeleport : MonoBehaviour
         if (transform.position.x < -horizontalOrthographicSize)
         {
             transform.position = new Vector3(transform.position.x + horizontalOrthographicSize * 2, transform.position.y, transform.position.z);
+        }
+    }
+
+    public void AddAction(Action _action)
+    {
+        actions.Enqueue(_action);
+    }
+
+    public void NotifyAboutTeleport()
+    {
+        int actionsCount = actions.Count;
+        for (int i = 0; i < actionsCount; i++)
+        {
+            actions.Dequeue()();
         }
     }
 }

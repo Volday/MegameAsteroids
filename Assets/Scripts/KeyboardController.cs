@@ -5,8 +5,15 @@ public class KeyboardController: Controller
 {
     public override void ControlsUpdate()
     {
-        if (Input.GetAxisRaw("KeyboardShoot") > 0) {
+        if (Input.GetAxisRaw("KeyboardShoot") > 0 && !shootButtonDown)
+        {
             player.Shoot();
+            shootButtonDown = true;
+        }
+        
+        if(Input.GetAxisRaw("KeyboardShoot") == 0)
+        {
+            shootButtonDown = false;
         }
 
         if (Input.GetAxisRaw("KeyboardMoveForward") > 0)

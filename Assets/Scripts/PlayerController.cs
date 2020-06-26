@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 [RequireComponent(typeof(Player))]
 public class PlayerController : MonoBehaviour
@@ -10,25 +12,39 @@ public class PlayerController : MonoBehaviour
 
     private ControllerType currentControllerType;
     public ControllerType defaultController;
-    private Controller currentController;
-    public Controller[] controllers;
+
+    public Dictionary<ControllerType, Control> listsOfPooledPrefabs = new Dictionary<ControllerType, Control>();
+    public Control[] controls;
+    private Control currentControl;
 
     private void Awake()
     {
-        currentController = controllers[(int)defaultController];
-        currentController.player = GetComponent<Player>();
+        for (int i = 0; i < controls.Length; i++)
+        {
+            listsOfPooledPrefabs.Add(controls[i].controllerType, controls[i]);
+        }
+        SetController(defaultController);
     }
 
-    void SetCurrentController(ControllerType _controllerType)
+    public ControllerType GetCurrentControllerType() {
+        return currentControllerType;
+    }
+
+    public void SetController(ControllerType _controllerType)
     {
-        if (currentControllerType != _controllerType) {
-            currentControllerType = _controllerType;
-            currentController = controllers[(int)currentControllerType];
-        }
+        currentControllerType = _controllerType;
+        currentControl = listsOfPooledPrefabs[currentControllerType];
+        currentControl.controller.player = GetComponent<Player>();
     }
 
     private void Update()
     {
-        currentController.ControlsUpdate();
+        currentControl.controller.ControlsUpdate();
+    }
+
+    [Serializable]
+    public class Control {
+        public ControllerType controllerType;
+        public Controller controller;
     }
 }
