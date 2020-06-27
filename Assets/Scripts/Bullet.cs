@@ -9,14 +9,22 @@ public class Bullet : MonoBehaviour
     private Vector3 lastPosition;
     private bool skipTick = false;
     public bool useRayCastHitScan = true;
+    public float bulletLifeTime;
+    public float bulletMoveSpeed;
 
-    public void Activate(float _bulletLifeTime, float _bulletMoveSpeed)
+    public void Activate()
     {
         gameObject.SetActive(true);
-        GetComponent<MovingForward>().SetMoveSpeed(_bulletMoveSpeed);
-        StartCoroutine(DieInTime(_bulletLifeTime));
+        GetComponent<MovingForward>().SetMoveSpeed(bulletMoveSpeed);
+        StartCoroutine(DieInTime(bulletLifeTime));
 
         lastPosition = transform.position;
+    }
+
+    public void Activate(float _bulletLifeTime)
+    {
+        bulletLifeTime = _bulletLifeTime;
+        Activate();
     }
 
     private void LateUpdate()

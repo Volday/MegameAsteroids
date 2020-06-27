@@ -1,16 +1,19 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(Damageable))]
 public class Player : MonoBehaviour
 {
     private GameController gameController;
+
+    public float invulnerabilityTime;
+    public GameObject scin;
 
     public float maxSpeed;
     public float rotationSpeed;
     public float acceleration;
     public float attackSpeed;
     public float bulletLifeTime;
-    public float bulletMoveSpeed;
 
     private bool shootingAvailable = true;
 
@@ -23,7 +26,6 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        ResetPlayer();
         StartCoroutine(Shooting());
     }
 
@@ -37,10 +39,16 @@ public class Player : MonoBehaviour
         movingVector = Vector3.zero;
         transform.position = startPosition;
         transform.LookAt(startPosition + startDirection);
+        gameObject.AddComponent<Invulnerability>().Activate(invulnerabilityTime, scin);
     }
 
     public void SetGameController(GameController _gameController) {
         gameController = _gameController;
+    }
+
+    public GameController GetGameController()
+    {
+        return gameController;
     }
 
     public void MoveForward() {
@@ -48,8 +56,10 @@ public class Player : MonoBehaviour
         movingVector = Vector3.ClampMagnitude(movingVector, maxSpeed);
     }
 
-    public void Rotate(Vector3 _targetToRotation) { 
-        
+    public void Rotate(Vector3 _targetToRotation) {
+        Vector3 direction = _targetToRotation - transform.position;
+        Quaternion newRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, newRotation, rotationSpeed * Time.deltaTime);
     }
 
     public void Rotate(float _angleOfRotation){
@@ -61,9 +71,7 @@ public class Player : MonoBehaviour
             GameObject newBullet = gameController.objectsPool.GetPooledObject(ObjectsPool.PoolType.greenBullet);
             newBullet.transform.position = muzzle.position;
             newBullet.transform.rotation = transform.rotation;
-            newBullet.GetComponent<MovingForward>().SetMoveSpeed(bulletMoveSpeed);
-            newBullet.GetComponent<Bullet>().Activate(bulletLifeTime, bulletMoveSpeed);
-            newBullet.SetActive(true);
+            newBullet.GetComponent<Bullet>().Activate(bulletLifeTime);
             
             shootingAvailable = false;
         }

@@ -63,12 +63,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa64b0b105c1db3439d73ef7abaf7a16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  invulnerabilityTime: 3
+  scin: {fileID: 8348096525898927139}
   maxSpeed: 8
   rotationSpeed: 90
   acceleration: 0.02
   attackSpeed: 0.1
-  bulletLifeTime: 5
-  bulletMoveSpeed: 10
+  bulletLifeTime: 3
   muzzle: {fileID: 1405401133090562592}
   startPosition: {x: 0, y: 0, z: 0}
   startDirection: {x: 0, y: 0, z: 1}

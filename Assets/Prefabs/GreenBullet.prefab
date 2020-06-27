@@ -72,6 +72,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a0277e4bf48eee479c9dac7c84a6f1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useRayCastHitScan: 1
+  bulletLifeTime: 3
+  bulletMoveSpeed: 25
 --- !u!54 &461475878387809712
 Rigidbody:
   m_ObjectHideFlags: 0

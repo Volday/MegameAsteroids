@@ -39,7 +39,9 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        currentControl.controller.ControlsUpdate();
+        if (Time.timeScale != 0) {
+            currentControl.controller.ControlsUpdate();
+        }
     }
 
     [Serializable]

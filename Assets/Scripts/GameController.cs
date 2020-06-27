@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(ObjectsPool))]
@@ -7,11 +8,14 @@ public class GameController : MonoBehaviour
     public int seed;
     public bool useRandomSeed;
 
+    public int maxPlayerHealthPoints;
+    private int currentPlayerHealthPoints;
+
     public Player player;
     public UFO ufo;
     public Menu menu;
     [HideInInspector] public ObjectsPool objectsPool;
-    private Camera mainCamera;
+    public Camera mainCamera;
 
     public int startAsteroidsCount;
     public int increaseAsteroidsCount;
@@ -25,6 +29,10 @@ public class GameController : MonoBehaviour
     private int currentAsteroidsCountAtWave;
     private List<GameObject> activeAsteroids = new List<GameObject>();
 
+    public float pctUFOSpawnHeightIndent;
+    public float minUFORespawnTime;
+    public float maxUFORespawnTime;
+
     private void Awake()
     {
         if (!useRandomSeed) {
@@ -32,10 +40,13 @@ public class GameController : MonoBehaviour
         }
 
         player.SetGameController(this);
+        ufo.SetGameController(this);
         menu.SetGameController(this);
 
         objectsPool = GetComponent<ObjectsPool>();
-        mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        if (mainCamera == null) {
+            mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        }
 
         player.gameObject.SetActive(false);
     }
@@ -47,10 +58,19 @@ public class GameController : MonoBehaviour
     public void NewGame() {
         player.gameObject.SetActive(true);
         player.ResetPlayer();
+        player.GetComponent<Damageable>().AddAction(DiePlayer);
+
+        currentPlayerHealthPoints = maxPlayerHealthPoints;
+        menu.UpdateHealthIcons(currentPlayerHealthPoints);
+        menu.ResetScore();
+
         currentAsteroidsCountAtWave = startAsteroidsCount;
         objectsPool.ResetPools();
         InitializationPools();
+
         NewWave();
+        DieUFO();
+
         gameStarted = true;
     }
 
@@ -76,16 +96,10 @@ public class GameController : MonoBehaviour
 
     public void RemoveActiveAsteroid(GameObject _gameObject)
     {
-        Debug.Log("asd");
         activeAsteroids.Remove(_gameObject);
         if (activeAsteroids.Count == 0) {
             NewWave();
         }
-    }
-
-    private void Update()
-    {
-        //Debug.Log(activeAsteroids.Count);
     }
 
     private Vector3 GetAsteroidSpawnPosition() {
@@ -152,11 +166,59 @@ public class GameController : MonoBehaviour
             objectsPool.pools[objectsPool.listsOfPooledPrefabs[ObjectsPool.PoolType.greenBullet]]
                 .Extension(maxPlayerBulletCount);
         }
-        int maxUFOBulletCount = (int)(ufo.bulletLifeTime * (1 / ufo.attackSpeed)) + 1;
+        int maxUFOBulletCount = (int)(ufo.bulletLifeTime * (1 / ufo.maxAttackDelay)) + 1;
         if (objectsPool.listsOfPooledPrefabs.ContainsKey(ObjectsPool.PoolType.redBullet))
         {
             objectsPool.pools[objectsPool.listsOfPooledPrefabs[ObjectsPool.PoolType.redBullet]]
                 .Extension(maxUFOBulletCount);
         }
+    }
+
+    public void DiePlayer() {
+        currentPlayerHealthPoints--;
+        menu.UpdateHealthIcons(currentPlayerHealthPoints);
+
+        if (currentPlayerHealthPoints > 0)
+        {
+            player.ResetPlayer();
+            player.GetComponent<Damageable>().AddAction(DiePlayer);
+        }
+        else {
+            gameStarted = false;
+            menu.PauseGame();
+        }
+    }
+
+    public void DieUFO() {
+        ufo.gameObject.SetActive(false);
+
+        float screenRatio = (float)Screen.width / Screen.height;
+        Vector3 position;
+        if (Random.Range(0, 2) == 0)
+        {
+            //справа
+            float heightFreeToSpawn = (1 - pctUFOSpawnHeightIndent / 100) * mainCamera.orthographicSize;
+            position = new Vector3(mainCamera.orthographicSize * screenRatio, 0, 
+                Random.Range(-heightFreeToSpawn, heightFreeToSpawn));
+            ufo.transform.rotation = Quaternion.Euler(0, -90, 0);
+        }
+        else
+        {
+            //слево
+            float heightFreeToSpawn = (1 - pctUFOSpawnHeightIndent / 100) * mainCamera.orthographicSize;
+            position = new Vector3(-mainCamera.orthographicSize * screenRatio, 0,
+                Random.Range(-heightFreeToSpawn, heightFreeToSpawn));
+            ufo.transform.rotation = Quaternion.Euler(0, 90,0);
+        }
+        ufo.transform.position = position;
+
+        float timeToRespawn = Random.Range(minUFORespawnTime, maxUFORespawnTime);
+        StartCoroutine(RespawnUFO(timeToRespawn));
+    }
+
+    IEnumerator RespawnUFO(float _timeToRespawn)
+    {
+        yield return new WaitForSeconds(_timeToRespawn);
+        ufo.Activate();
     }
 }
