@@ -24,6 +24,8 @@ public class Player : MonoBehaviour
 
     private Vector3 movingVector;
 
+    private bool playAudio;
+
     private void Start()
     {
         StartCoroutine(Shooting());
@@ -54,6 +56,10 @@ public class Player : MonoBehaviour
     public void MoveForward() {
         movingVector += transform.forward * acceleration;
         movingVector = Vector3.ClampMagnitude(movingVector, maxSpeed);
+
+        playAudio = true;
+
+        gameController.audio2dController.PlayAudioContinuous(Audio2dController.AudioClipType.thrustSound, MovementCheck);
     }
 
     public void Rotate(Vector3 _targetToRotation) {
@@ -62,6 +68,7 @@ public class Player : MonoBehaviour
         transform.rotation = Quaternion.RotateTowards(transform.rotation, newRotation, rotationSpeed * Time.deltaTime);
     }
 
+    /// <param name="_angleOfRotation"> должен быть в значениях от -1 до 1</param>
     public void Rotate(float _angleOfRotation){
         transform.Rotate(new Vector3(0, _angleOfRotation * rotationSpeed * Time.deltaTime, 0));
     }
@@ -72,8 +79,22 @@ public class Player : MonoBehaviour
             newBullet.transform.position = muzzle.position;
             newBullet.transform.rotation = transform.rotation;
             newBullet.GetComponent<Bullet>().Activate(bulletLifeTime);
-            
+
+            gameController.audio2dController.PlayAudio(Audio2dController.AudioClipType.shootSound);
+
             shootingAvailable = false;
+        }
+    }
+
+    //Отправляется в качестве делегата для Audio2dController для проверки двигается ли ещё игрок
+    public bool MovementCheck() {
+        if (playAudio)
+        {
+            playAudio = false;
+            return true;
+        }
+        else {
+            return false;
         }
     }
 

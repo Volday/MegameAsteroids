@@ -6,12 +6,14 @@ public class DividableAsteroid : Asteroid
     public ObjectsPool.PoolType childType;
 
     public override void Die() {
+        //Считает угол между дочерними астероидами
         float angleBetweenAsteroids = 0;
         if (gameController.numberOfAsteroidChild > 1)
         {
             angleBetweenAsteroids = gameController.angleOfAsteroidsSpread * 2 / (gameController.numberOfAsteroidChild - 1);
         }
 
+        //Достает и активирует дочернии астероиды из ObjectPool
         float childSpeed = Random.Range(gameController.minAsteroidSpeed, gameController.maxAsteroidSpeed);
         for (int i = 0; i < gameController.numberOfAsteroidChild; i++) {
             GameObject newAsteroid = gameController.objectsPool.GetPooledObject(childType);

@@ -153,6 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d84771bb70195ac408ff317d70995d32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionsCount: 0
 --- !u!114 &3819367143363332707
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -166,6 +167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameController: {fileID: 0}
+  audioClipType: 4
 --- !u!135 &2329069405336431208
 SphereCollider:
   m_ObjectHideFlags: 0

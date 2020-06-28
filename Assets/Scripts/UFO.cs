@@ -3,6 +3,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(MovingForward))]
 [RequireComponent(typeof(Damageable))]
+[RequireComponent(typeof(KillForPoints))]
 public class UFO : MonoBehaviour
 {
     private GameController gameController;
@@ -24,6 +25,7 @@ public class UFO : MonoBehaviour
     public void Activate()
     {
         gameObject.SetActive(true);
+        GetComponent<KillForPoints>().Activate(gameController);
         GetComponent<Damageable>().AddAction(gameController.DieUFO);
         StartCoroutine(Shooting());
     }
@@ -40,6 +42,8 @@ public class UFO : MonoBehaviour
         newBullet.transform.Rotate(new Vector3(0, Random.Range(-projectileSpread, projectileSpread), 0));
         newBullet.transform.position += newBullet.transform.forward * spawnBulletDistance;
         newBullet.GetComponent<Bullet>().Activate(bulletLifeTime);
+
+        gameController.audio2dController.PlayAudio(Audio2dController.AudioClipType.shootSound);
     }
 
     IEnumerator Shooting()

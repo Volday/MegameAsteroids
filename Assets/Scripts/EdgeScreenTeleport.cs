@@ -20,20 +20,24 @@ public class EdgeScreenTeleport : MonoBehaviour
         //Телепорт по вертикали экрана
         if (transform.position.z > mainCamera.orthographicSize) 
         {
+            NotifyAboutTeleport();
             transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z - mainCamera.orthographicSize * 2);
         }
         if (transform.position.z < -mainCamera.orthographicSize)
         {
+            NotifyAboutTeleport();
             transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + mainCamera.orthographicSize * 2);
         }
         //Телепорт по горизонтали экрана
         float horizontalOrthographicSize = mainCamera.orthographicSize * screenRatio;
         if (transform.position.x > horizontalOrthographicSize)
         {
+            NotifyAboutTeleport();
             transform.position = new Vector3(transform.position.x - horizontalOrthographicSize * 2, transform.position.y, transform.position.z);
         }
         if (transform.position.x < -horizontalOrthographicSize)
         {
+            NotifyAboutTeleport();
             transform.position = new Vector3(transform.position.x + horizontalOrthographicSize * 2, transform.position.y, transform.position.z);
         }
     }

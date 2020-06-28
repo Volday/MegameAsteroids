@@ -55,6 +55,7 @@ public class ObjectsPool : MonoBehaviour
         private int extensionOverWave = 0;
         private int countOfUsingObjects = 0;
 
+        //Увеличивает размер пула на значение _extensionCount
         public void Extension(int _extensionCount) {
             for (int i = 0; i < _extensionCount; i++) {
                 if (countOfUsingObjects + _extensionCount > pooledPrefabs.Count)
@@ -84,8 +85,10 @@ public class ObjectsPool : MonoBehaviour
             extensionOverWave = _extensionOverWave;
         }
 
+        //Сбрасывает размер расширения пула и все вытащенные из пула объекты, но не удаляет их
         public void ResetPool() {
             countOfUsingObjects = 0;
+            extensionOverWave = 0;
             for (int i = 0; i < pooledPrefabs.Count; i++)
             {
                 pooledPrefabs[i].SetActive(false);

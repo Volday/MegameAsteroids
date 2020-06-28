@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(ObjectsPool))]
+[RequireComponent(typeof(Audio2dController))]
 public class GameController : MonoBehaviour
 {
     public int seed;
@@ -15,11 +16,14 @@ public class GameController : MonoBehaviour
     public UFO ufo;
     public Menu menu;
     [HideInInspector] public ObjectsPool objectsPool;
+    [HideInInspector] public Audio2dController audio2dController;
     public Camera mainCamera;
 
     public int startAsteroidsCount;
     public int increaseAsteroidsCount;
     public int numberOfAsteroidChild;
+    public float waveSpawnTime;
+    private IEnumerator newWave;
 
     public float minAsteroidSpeed;
     public float maxAsteroidSpeed;
@@ -32,12 +36,15 @@ public class GameController : MonoBehaviour
     public float pctUFOSpawnHeightIndent;
     public float minUFORespawnTime;
     public float maxUFORespawnTime;
+    private IEnumerator respawnUFO;
 
     private void Awake()
     {
         if (!useRandomSeed) {
             Random.InitState(seed);
         }
+
+        audio2dController = GetComponent<Audio2dController>();
 
         player.SetGameController(this);
         ufo.SetGameController(this);
@@ -56,6 +63,13 @@ public class GameController : MonoBehaviour
     }
 
     public void NewGame() {
+        //Сбрасываются все накопленные предсмертные эффекты
+        Damageable[] damageables = FindObjectsOfType<Damageable>();
+        for (int i = 0; i < damageables.Length; i++)
+        {
+            damageables[i].ClearActions();
+        }
+
         player.gameObject.SetActive(true);
         player.ResetPlayer();
         player.GetComponent<Damageable>().AddAction(DiePlayer);
@@ -65,27 +79,36 @@ public class GameController : MonoBehaviour
         menu.ResetScore();
 
         currentAsteroidsCountAtWave = startAsteroidsCount;
+        activeAsteroids.Clear();
         objectsPool.ResetPools();
         InitializationPools();
 
-        NewWave();
+        if (newWave != null) {
+            StopCoroutine(newWave);
+        }
+        newWave = NewWave();
+        StartCoroutine(newWave);
         DieUFO();
 
         gameStarted = true;
     }
 
-    private void NewWave() {
+    IEnumerator NewWave() {
+        //После задержки waveSpawnTime берёт из пула и расставляет большие астероиды
+        yield return new WaitForSeconds(waveSpawnTime);
         for (int i = 0; i < currentAsteroidsCountAtWave; i++) {
             GameObject newAsteroid = objectsPool.GetPooledObject(ObjectsPool.PoolType.bigAsteroid);
 
             float screenRatio = (float)Screen.width / Screen.height;
-            newAsteroid.transform.LookAt(new Vector3(Random.Range(-mainCamera.orthographicSize, mainCamera.orthographicSize) 
-                * screenRatio, 0, Random.Range(-mainCamera.orthographicSize, mainCamera.orthographicSize)));
+            Vector3 direction = new Vector3(Random.Range(-mainCamera.orthographicSize, mainCamera.orthographicSize)
+                * screenRatio, 0, Random.Range(-mainCamera.orthographicSize, mainCamera.orthographicSize));
+
+            newAsteroid.transform.LookAt(direction);
 
             newAsteroid.GetComponent<Asteroid>().Activate(GetAsteroidSpawnPosition(), this, Random.Range(minAsteroidSpeed, maxAsteroidSpeed));
         }
 
-        //расширение пула астероидов
+        //Расширение пула астероидов
         currentAsteroidsCountAtWave += increaseAsteroidsCount;
         objectsPool.PoolsExtension();
     }
@@ -97,8 +120,13 @@ public class GameController : MonoBehaviour
     public void RemoveActiveAsteroid(GameObject _gameObject)
     {
         activeAsteroids.Remove(_gameObject);
-        if (activeAsteroids.Count == 0) {
-            NewWave();
+        if (activeAsteroids.Count == 0) {//Если не остаётся активных астероидов запускается новая волна
+            if (newWave != null)
+            {
+                StopCoroutine(newWave);
+            }
+            newWave = NewWave();
+            StartCoroutine(newWave);
         }
     }
 
@@ -107,18 +135,19 @@ public class GameController : MonoBehaviour
         float screenRatio = (float)Screen.width / Screen.height;
         float halfHeight = mainCamera.orthographicSize;
         float halfWidth = mainCamera.orthographicSize * screenRatio;
+        Vector3 spawnPosition;
         if (orientation)
         {
             //по горизонтали
             if (Random.Range(0, 2) == 0)
             {
                 //сверху
-                return new Vector3(Random.Range(-halfWidth, halfWidth), 0, halfHeight);
+                spawnPosition = new Vector3(Random.Range(-halfWidth, halfWidth), 0, halfHeight);
             }
             else
             {
                 //снизу
-                return new Vector3(Random.Range(-halfWidth, halfWidth), 0, -halfHeight);
+                spawnPosition = new Vector3(Random.Range(-halfWidth, halfWidth), 0, -halfHeight);
             }
         }
         else {
@@ -126,18 +155,20 @@ public class GameController : MonoBehaviour
             if (Random.Range(0, 2) == 0)
             {
                 //спарва
-                return new Vector3(halfWidth, 0, Random.Range(-halfHeight, halfHeight));
+                spawnPosition = new Vector3(halfWidth, 0, Random.Range(-halfHeight, halfHeight));
             }
             else
             {
                 //слева
-                return new Vector3(-halfWidth, 0, Random.Range(-halfHeight, halfHeight));
+                spawnPosition = new Vector3(-halfWidth, 0, Random.Range(-halfHeight, halfHeight));
             }
         }
+        return spawnPosition;
     }
 
     private void InitializationPools()
     {
+        //Устанавливается размер расширения пула, для новой волны
         objectsPool.pools[objectsPool.listsOfPooledPrefabs[ObjectsPool.PoolType.bigAsteroid]]
             .SetExtensionOverWave(increaseAsteroidsCount);
         objectsPool.pools[objectsPool.listsOfPooledPrefabs[ObjectsPool.PoolType.mediumAsteroid]]
@@ -145,6 +176,7 @@ public class GameController : MonoBehaviour
         objectsPool.pools[objectsPool.listsOfPooledPrefabs[ObjectsPool.PoolType.smallAsteroid]]
             .SetExtensionOverWave(increaseAsteroidsCount * numberOfAsteroidChild * numberOfAsteroidChild);
 
+        //Устанавливается стартовые размеры пулов
         if (objectsPool.listsOfPooledPrefabs.ContainsKey(ObjectsPool.PoolType.bigAsteroid))
         {
             objectsPool.pools[objectsPool.listsOfPooledPrefabs[ObjectsPool.PoolType.bigAsteroid]]
@@ -194,7 +226,7 @@ public class GameController : MonoBehaviour
 
         float screenRatio = (float)Screen.width / Screen.height;
         Vector3 position;
-        if (Random.Range(0, 2) == 0)
+        if (Random.Range(0, 2) == 0)//Выбор новой позиции
         {
             //справа
             float heightFreeToSpawn = (1 - pctUFOSpawnHeightIndent / 100) * mainCamera.orthographicSize;
@@ -213,7 +245,11 @@ public class GameController : MonoBehaviour
         ufo.transform.position = position;
 
         float timeToRespawn = Random.Range(minUFORespawnTime, maxUFORespawnTime);
-        StartCoroutine(RespawnUFO(timeToRespawn));
+        if (respawnUFO != null) {
+            StopCoroutine(respawnUFO);
+        }
+        respawnUFO = RespawnUFO(timeToRespawn);
+        StartCoroutine(respawnUFO);
     }
 
     IEnumerator RespawnUFO(float _timeToRespawn)

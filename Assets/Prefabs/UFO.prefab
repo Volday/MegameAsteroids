@@ -134,7 +134,7 @@ MonoBehaviour:
   minAttackDelay: 2
   maxAttackDelay: 5
   bulletLifeTime: 3
-  projectileSpread: 15
+  projectileSpread: 0
   spawnBulletDistance: 1.5
 --- !u!114 &7141437641422211378
 MonoBehaviour:
@@ -160,6 +160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d84771bb70195ac408ff317d70995d32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionsCount: 0
 --- !u!114 &-4238935832711183642
 MonoBehaviour:
   m_ObjectHideFlags: 0

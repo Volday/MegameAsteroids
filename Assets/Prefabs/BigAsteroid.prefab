@@ -74,6 +74,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d84771bb70195ac408ff317d70995d32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionsCount: 0
 --- !u!114 &-2152245485702600119
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87,6 +88,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameController: {fileID: 0}
+  audioClipType: 2
   child: {fileID: 4250586449071179039, guid: 489b9326f7c2ada478376c72bb7f5318, type: 3}
   childType: 3
 --- !u!135 &5400903120994863040

@@ -9,10 +9,10 @@ public class KillForPoints : MonoBehaviour
 
     private GameController gameController;
 
-    private void Awake()
+    public void Activate(GameController _gameController)
     {
         GetComponent<Damageable>().AddAction(GivePoints);
-        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        gameController = _gameController;
     }
 
     public void GivePoints() {

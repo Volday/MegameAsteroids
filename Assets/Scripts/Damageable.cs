@@ -5,6 +5,12 @@ using UnityEngine;
 public class Damageable : MonoBehaviour
 {
     List<Action> actions = new List<Action>();
+    public int actionsCount;
+
+    private void Update()
+    {
+        actionsCount = actions.Count;
+    }
 
     public void AddAction(Action _action) {
         actions.Add(_action);
@@ -20,6 +26,7 @@ public class Damageable : MonoBehaviour
         actions.Clear();
     }
 
+    //Если цель не неуязвима, выполняет все делегированные методы, которые пришли до вызова метода
     public void TakeHit() {
         if (GetComponent<Invulnerability>() == null) {
             int actionsCount = actions.Count;

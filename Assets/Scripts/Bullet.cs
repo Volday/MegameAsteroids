@@ -17,6 +17,9 @@ public class Bullet : MonoBehaviour
         gameObject.SetActive(true);
         GetComponent<MovingForward>().SetMoveSpeed(bulletMoveSpeed);
         StartCoroutine(DieInTime(bulletLifeTime));
+        if (useRayCastHitScan) {
+            GetComponent<EdgeScreenTeleport>().AddAction(SkipOneTick);
+        }
 
         lastPosition = transform.position;
     }
@@ -29,6 +32,7 @@ public class Bullet : MonoBehaviour
 
     private void LateUpdate()
     {
+        //Проверка столкновений с помощью RayCast
         if (useRayCastHitScan) {
             if (!skipTick)
             {
@@ -51,6 +55,7 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        //Проверка столкновений с помощью OnTriggerEnter
         if (other.gameObject.GetComponent<Damageable>() != null)
         {
             other.gameObject.GetComponent<Damageable>().TakeHit();
@@ -58,6 +63,7 @@ public class Bullet : MonoBehaviour
         }
     }
 
+    //Метод вызывается если пуля в этом кадре телепортировалась
     public void SkipOneTick()
     {
         skipTick = true;

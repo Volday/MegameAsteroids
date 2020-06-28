@@ -8,7 +8,7 @@ public class Menu : MonoBehaviour
     public GameObject inGameInterface;
 
     public Text changeControlButtonText;
-    public Button resumeButtorn;
+    public Button resumeButton;
 
     public Text scoreText;
     public Transform health;
@@ -27,20 +27,13 @@ public class Menu : MonoBehaviour
 
     private void Update()
     {
+        //Включение\Отключение меню по кнопке клавиатуры
         if (Input.GetAxisRaw("Menu") > 0 && menuTriggered == false) {
             if (Time.timeScale == 0)
             {
                 ResumeGame();
             }
             else {
-                if (gameController.GetGameStatus())
-                {
-                    resumeButtorn.interactable = true;
-                }
-                else {
-                    resumeButtorn.interactable = false;
-                }
-
                 PauseGame();
             }
             menuTriggered = true;
@@ -48,6 +41,18 @@ public class Menu : MonoBehaviour
 
         if (Input.GetAxisRaw("Menu") == 0) {
             menuTriggered = false;
+        }
+
+        //Отключение кнопки "Продолжить", если игра не начата
+        if (escMenu.activeSelf) {
+            if (gameController.GetGameStatus())
+            {
+                resumeButton.interactable = true;
+            }
+            else
+            {
+                resumeButton.interactable = false;
+            }
         }
     }
 
@@ -114,6 +119,7 @@ public class Menu : MonoBehaviour
         escMenu.SetActive(false);
     }
 
+    //Переключение управления между клавиатурой, и клавиатурой с мышью
     public void ChangeControl() {
         PlayerController playerController = gameController.player.GetComponent<PlayerController>();
         if (playerController.GetCurrentControllerType() == PlayerController.ControllerType.keyboard) {
@@ -131,6 +137,6 @@ public class Menu : MonoBehaviour
 
     public void Exit()
     {
-
+        Application.Quit();
     }
 }
